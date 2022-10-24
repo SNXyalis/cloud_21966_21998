@@ -38,10 +38,10 @@ def delete(id):
     return jsonify({'response': 'Deleted User'})
 
 
-@bp.route('/user/<id>')
-def user(id):
+@bp.route('/user/<username>')
+def user(username):
     db = get_db()
-    user = User.objects[0]
+    user = User.objects(username=username)[0]
     #user = read_user(id)
 
-    return jsonify({'username': user.username, 'password': user.password}), 200
+    return jsonify(user.toDict()), 200
