@@ -16,6 +16,9 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import article
+    app.register_blueprint(article.bp)
+
     # a simple page that says hello
     @app.route('/fmk/v1')
     def hello():

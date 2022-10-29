@@ -1,5 +1,7 @@
 from curses import keyname
 import functools, requests
+import json
+from requests.exceptions import HTTPError
 from urllib import response
 
 from flask import (
@@ -24,18 +26,23 @@ KEYWORDS_STR = [
     "Tencent"
 ]
 
-@bp.route('/insert/<keyword>', methods=['GET', 'POST'])
-def insert(keyword):
+@bp.route('/insert/<key>', methods=['GET', 'POST'])
+def insert(key):
     if request.method == 'POST':
         db = get_db()
         try:
-            response = requests.get('https://newsapi.org/v2/everything?q='+keyword+'&from=2022-10-21&sortBy=popularity&apiKey=dfa72c75b9ec4b3d8470b1786f586658')
+            response = requests.get('https://newsapi.org/v2/everything?q='+key+'&from=2022-10-21&sortBy=popularity&apiKey=dfa72c75b9ec4b3d8470b1786f586658')
             response.raise_for_status()
-            jsonResponse = response.json()
-            articles = Article(**data)
+            data = json.loads(response.text)
+            filtered_data = {
+                'keyword': key,
+                'articles': data['articles']
+            }
 
-            if keyword.capitalize() in KEYWORDS_STR:
-                articles.switch_collection(keyword.capitalize())
+            articles = Article(keyword=key, articles=data['articles'])
+
+            if key.capitalize() in KEYWORDS_STR:
+                articles.switch_collection(key.capitalize())
                 articles.save()
                 return jsonify({'response': 'Added Articles'})
         except HTTPError as http_err:
@@ -45,13 +52,15 @@ def insert(keyword):
 
     return jsonify({'response': 'Failed to add articles'})
 
-@bp.route('/get/<keyword>')
-def articles(keyword):
+@bp.route('/get/<key>')
+def articles(key):
     db = get_db()
-    if keyword.capitalize() in KEYWORDS_STR:
-        articles = Article.switch_collection(Article(), keyword.capitalize())
+    if key.capitalize() in KEYWORDS_STR:
+        articles = Article.switch_collection(Article(), key.capitalize())
         from mongoengine.queryset import QuerySet
         new_objects = QuerySet(Article,articles._get_collection())
-        print(new_objects)
-
- #   return jsonify(articles.toDict()), 200
+        d = {}
+        for artcl in new_objects:
+            d.update(json.loads(artcl.to_json()))
+        return jsonify(d), 200
+    return jsonify({'data': 'Error'})
