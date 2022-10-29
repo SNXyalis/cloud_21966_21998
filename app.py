@@ -11,10 +11,6 @@ def create_app(test_config=None):
         "host": "localhost",
         "port": 27017
     }
-    #db = MongoEngine(app)
-    #add command(optional)
-    #from . import db
-    #db.init_app(app)
 
     #add blueprint
     from . import auth

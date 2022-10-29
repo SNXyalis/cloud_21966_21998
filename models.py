@@ -1,6 +1,21 @@
 import email, time
+from random import choices
 from email.policy import default
 import mongoengine as me
+
+#News API dfa72c75b9ec4b3d8470b1786f586658
+#API: "https://newsapi.org/v2/everything?q="+KEYWORD+"&from=2022-10-21&sortBy=popularity&apiKey="+ API_KEY
+
+KEYWORDS_STR = [
+    "Tesla", 
+    "Microsoft", 
+    "Apple",
+    "Verizon",
+    "Meta",
+    "Coinbase",
+    "Amazon",
+    "Tencent"
+]
 
 class User(me.Document):
     #DB configs
@@ -45,4 +60,14 @@ class Keyword(me.Document):
     def toDict(self):
         return {
             'keywords': self.keywords
+        }
+
+class Article(me.Document):
+
+    keyword=me.StringField(max_length=50, choices=KEYWORDS_STR)
+    articles=me.ListField(me.DictField())
+    
+    def toDict(self):
+        return {
+            'articles': self.articles
         }
