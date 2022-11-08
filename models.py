@@ -71,3 +71,13 @@ class Article(me.Document):
         return {
             'articles': self.articles
         }
+
+class SDName(me.Document):
+    name=me.StringField(max_length=50)
+    description=me.StringField(max_length=200000)
+
+    def toDict(self):
+        return {
+            'name': self.name,
+            'description': self.description
+        }
