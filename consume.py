@@ -135,7 +135,7 @@ def consumer_save(topic):
                     data = record.value
 
                     sdn = SDName(name=data["name"], description=data['description'])
-                    sdn.switch_collection(topic.capitalize())
+                    #sdn.switch_collection(topic.capitalize())
                     sdn.save()
         
                     print(data["name"])
