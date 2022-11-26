@@ -83,6 +83,22 @@ def getMessage(email_param):
     return jsonify(dict_to_json)
 
 
+
+@bp.route('/update/<email_param>', methods=['PUT'])
+def update(email_param):
+    db = get_db()
+    data=request.get_json()
+
+    for user in User.objects(email=email_param):
+        try:
+            user.update(**data)
+        except Exception as er:
+            print("{e}. Could not assign keywords to user during update(email_param)")
+
+    return jsonify({'response': 'Updated User'})
+
+
+
 @bp.route('/delete/<email_param>', methods=['DELETE'])
 def delete(email_param):
     #delete_user(id)
@@ -91,7 +107,7 @@ def delete(email_param):
         try:
             user.delete()
         except Exception as er:
-            print("{e}. Could not assign keywords to user during getMessage(email_param)")
+            print("{e}. Could not assign keywords to user during delete(email_param)")
 
     return jsonify({'response': 'Deleted User'})
 
@@ -104,7 +120,7 @@ def user(email_param):
         try:
             u = user.toDict()
         except Exception as er:
-            print("{e}. Could not assign keywords to user during getMessage(email_param)")
+            print("{e}. Could not assign keywords to user during user(email_param)")
 
 
     return jsonify(u), 200
