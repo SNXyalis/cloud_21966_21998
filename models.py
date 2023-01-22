@@ -72,6 +72,29 @@ class Article(me.Document):
             'articles': self.articles
         }
 
+class SingleArticle(me.Document):
+    author=me.StringField(max_length=200000)
+    content=me.StringField(max_length=200000)
+    description=me.StringField(max_length=200000)
+    publishedAt=me.StringField(max_length=200000)
+    source=me.DictField()
+    title=me.StringField(max_length=200000)
+    url=me.StringField(max_length=200000)
+    urlToImage=me.StringField(max_length=200000)
+
+    def toDict(self):
+        return {
+            'author': self.author,
+            'content': self.content,
+            'description': self.description,
+            'publishedAt': self.publishedAt,
+            'source': self.source,
+            'title': self.title,
+            'url': self.url,
+            'urlToImage': self.urlToImage
+        }
+
+
 class SDName(me.Document):
     name=me.StringField(max_length=50)
     description=me.StringField(max_length=200000)

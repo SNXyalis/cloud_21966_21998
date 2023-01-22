@@ -2,11 +2,21 @@ from time import sleep
 from json import dumps  
 import kafka, requests, json
 from requests.exceptions import HTTPError
+import mongoengine as me
+from models import SingleArticle
+from datetime import datetime
+
+try:
+    me.connect('fmk_assignment', host='localhost', port=27017)
+except Exception as err:
+    print(f'Error during connection to db {err}')
  
 k_producer = kafka.KafkaProducer(  
     bootstrap_servers = ['localhost:9092'],  
     value_serializer = lambda x:dumps(x).encode('utf-8')  
 ) 
+
+DATE=datetime.today().strftime('%Y-%m-%d')
 
 KEYWORDS_STR = [
     "Tesla", 
@@ -26,7 +36,7 @@ def get_newsapi_data():
         try:
 
             #Get newsapi and filter the articles
-            response = requests.get('https://newsapi.org/v2/everything?q='+key_+'&from=2022-10-21&sortBy=popularity&apiKey=dfa72c75b9ec4b3d8470b1786f586658')
+            response = requests.get('https://newsapi.org/v2/everything?q='+key_+'&from='+DATE+'&sortBy=popularity&apiKey=dfa72c75b9ec4b3d8470b1786f586658')
             response.raise_for_status()
             data = json.loads(response.text)
             filtered_data = {
@@ -36,6 +46,10 @@ def get_newsapi_data():
 
             #Filter the source names
             for entry in data['articles']:
+                # Add article to mongodb
+                singleArticle = SingleArticle(**entry)
+                singleArticle.save()
+
                 sources_list.add(entry['source']['name'])
 
             #Sends only the articles
@@ -84,6 +98,7 @@ def get_newsapi_data():
     
 def producer_run():#Call producer and queue data from APIs every 2 hours
     while True:
+        DATE = datetime.today().strftime('%Y-%m-%d')
         get_newsapi_data()
         sleep(7200)
 
