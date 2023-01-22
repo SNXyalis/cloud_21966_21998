@@ -2,3 +2,6 @@ Flask
 flask-mongoengine
 kafka-python
 networkx
+numpy
+pandas
+matplotlib
